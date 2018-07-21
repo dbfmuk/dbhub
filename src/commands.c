@@ -1296,7 +1296,30 @@ if(spam_action > 0)
 //		if(url_mem != NULL)
 //		free(url_mem);
 		}
-                
+                if((strstr(buf, "https://") != NULL) && (strlen(user->nick) > 0))
+		{
+		urltemp=strstr(buf, "https://");
+                if(sscanf(urltemp, "%150s", tempstring) == 1)
+		{
+		if(tempstring[strlen(tempstring) - 1] == '|')
+		tempstring[strlen(tempstring) - 1] = '\0';
+		}			
+        	snprintf(largestring, 500, "[ %s ]", tempstring);
+		loadfile2buf(&url_mem,URL_FILE);
+		if(mystristr(url_mem, largestring) == NULL)
+		{
+		timeinfo = localtime ( &now );
+		snprintf(acttime, 50, "%s", asctime (timeinfo));
+		trim_string(acttime);
+		sscanf(acttime, "%5s %5s %3s %10s %5s", sdayn, smont, sday, sdate, syear);		
+		snprintf(largestring, 500, "%lu <-> [ %s ], %s: [ %s @ %s %s %s, %s ]", now + (expiredurl * 86400), tempstring, lp_user_, user->nick, sday, smont, syear, sdate);
+		snprintf(path, MAX_FDP_LEN, "%s/%s", config_dir, URL_FILE);
+		add_line_to_file(largestring, path);
+		}
+//		if(url_mem != NULL)
+//		free(url_mem);
+		}
+		
 		// Logging main chat - Centurion - 03.06.2006
 		trim_string(msgl);
 		if(((user->type & (REGULAR | PROTECTED | REG | VIP | KVIP | OP | CHEEF | ADMIN | OWNER)) != 0) && (log_main_chat == 1) && (strstr(msgl, "[") == NULL) && (strchr(msgl, '\n') == NULL))
@@ -2114,7 +2137,7 @@ int my_info(char *org_buf, struct user_t *user)
 			return 0;
 	}
 
-	/* If the command was sent from a human, make sure that the provided nick 
+	/*Â If the command was sent from a human, make sure that the provided nick 
 	* matches the one provided with $ValidateNick.  */
 	if((user->type & (NON_LOGGED | REGULAR | PROTECTED | REG | VIP | KVIP | OP | CHEEF | ADMIN | OWNER)) != 0)
 	{
